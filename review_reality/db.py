@@ -60,6 +60,21 @@ def write_database(clean, db_path=DB_PATH):
     return db_path
 
 
+ANALYTICS_INDEXES = """
+CREATE INDEX idx_mentions_review ON aspect_mentions(review_id);
+CREATE INDEX idx_mentions_aspect ON aspect_mentions(aspect);
+CREATE INDEX idx_scores_review ON review_scores(review_id);
+"""
+
+
+def write_analytics(tables, db_path=DB_PATH):
+    """Add the analytics tables (aspect_mentions, review_scores, ...) to the database."""
+    with sqlite3.connect(db_path) as conn:
+        for name, table in tables.items():
+            table.to_sql(name, conn, if_exists="replace", index=False)
+        conn.executescript(ANALYTICS_INDEXES)
+
+
 def read_sql_file(name):
     return (SQL_DIR / f"{name}.sql").read_text(encoding="utf-8")
 

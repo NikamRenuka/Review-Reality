@@ -9,7 +9,7 @@ Review Reality is a review analytics project. It helps:
 
 Example question: a product has 4.8 stars, but many reviews mention battery problems. Another has 4.5 stars and fewer repeated complaints. Which one is the safer buy? Review Reality answers questions like this with evidence from real review data.
 
-> **Status:** Phase 3 done (clean data in SQLite, tested SQL queries). Analysis comes next. Nothing in this project is a finding until it is calculated from the real dataset.
+> **Status:** Phase 5 done (analytics calculated and tested). The dashboard comes next. Nothing in this project is a finding until it is calculated from the real dataset.
 
 ## Honest limits (we will keep these all through the project)
 
@@ -46,15 +46,21 @@ Review-Reality/
 │   ├── raw/datafiniti/  The three Kaggle CSV files
 │   └── processed/       Cleaned SQLite database (Phase 3)
 ├── docs/
-│   └── DATASET.md       Source, licence, data dictionary, known issues
+│   ├── DATASET.md           Source, licence, data dictionary, known issues
+│   ├── METHODOLOGY.md       How each number is calculated and how far to trust it
+│   ├── DATA_QUALITY.md      Generated: cleaning counts, missing values
+│   └── ANALYSIS_RESULTS.md  Generated: model scores, complaints per product, patterns
 ├── review_reality/      Reusable Python code
 │   ├── paths.py         All file locations
 │   ├── load.py          Read the raw CSVs, rename columns
 │   ├── products.py      Group listings into product families
 │   ├── clean.py         Fix types, remove unusable rows and copied reviews, anonymise reviewers
 │   ├── db.py            Save to SQLite, run SQL files
+│   ├── aspects.py       Keyword rules: which aspect a sentence talks about
+│   ├── sentiment.py     Text model: how negative a sentence sounds (tested on held-out reviews)
+│   ├── analytics.py     Aspect complaints, out-of-fold review scores, similar reviews
 │   └── build.py         Run everything: python -m review_reality.build
-├── sql/                 One SQL file per question (summary, ratings, trends, bursts, shops)
+├── sql/                 One SQL file per question (summary, ratings, trends, bursts, aspects, mismatches)
 ├── app.py               Streamlit dashboard (Phase 6)
 └── tests/               pytest tests
 ```
@@ -67,7 +73,7 @@ py -m venv .venv                 # make the virtual environment (only once)
 .venv\Scripts\Activate.ps1       # turn it on (each new terminal)
 python --version                 # should show Python 3.15.x
 python -m pip install -r requirements.txt   # install the libraries (only once)
-python -m review_reality.build   # clean the data and build data/processed/reviews.db (about 10 s)
+python -m review_reality.build   # clean, analyse, build data/processed/reviews.db (about 2 min)
 python -m pytest                 # run the tests
 ```
 
@@ -79,8 +85,8 @@ If PowerShell blocks `Activate.ps1`, run this once:
 - [x] **Phase 1:** Environment and project setup
 - [x] **Phase 2:** Choose and understand the dataset
 - [x] **Phase 3:** Data cleaning and SQL (67,992 raw rows → 51,163 unique reviews; see [docs/DATA_QUALITY.md](docs/DATA_QUALITY.md))
-- [ ] **Phase 4:** Exploratory data analysis
-- [ ] **Phase 5:** Core analytics (sentiment, complaint types, similar reviews, comparisons)
+- [x] **Phase 4:** Exploratory data analysis (complaint words found from the data itself)
+- [x] **Phase 5:** Core analytics (sentence-level aspect complaints, text model with balanced accuracy 0.895 on held-out reviews, similar reviews, bursts, star/text mismatches; see [docs/METHODOLOGY.md](docs/METHODOLOGY.md))
 - [ ] **Phase 6:** Dashboard (Shopper and Seller views)
 - [ ] **Phase 7:** Testing and quality checks
 - [ ] **Phase 8:** Documentation and interview preparation
