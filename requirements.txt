@@ -1,0 +1,8 @@
+# Install with:  python -m pip install -r requirements.txt
+# Versions tested on Python 3.15.1 (Windows 11).
+pandas==3.1.0
+numpy==2.5.4
+streamlit==1.66.1
+plotly==7.1.0
+scikit-learn==1.9.1
+pytest==9.2.0

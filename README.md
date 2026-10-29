@@ -30,7 +30,7 @@ Example question: a product has 4.8 stars, but many reviews mention battery prob
 | pytest | Automatic tests |
 | Git + GitHub | Version control and portfolio |
 
-Libraries are installed in Phase 2, when we know exactly which ones we need.
+Exact versions are in `requirements.txt` (all tested on Python 3.15.1).
 
 ## Planned folder structure
 
@@ -40,7 +40,7 @@ Folders are created in the phase that first needs them.
 Review-Reality/
 ├── README.md            Project overview, setup steps, progress
 ├── .gitignore           Files Git must never save (venv, data, secrets)
-├── requirements.txt     Exact library list            (Phase 2)
+├── requirements.txt     Exact library list
 ├── data/
 │   ├── raw/             Downloaded dataset, NOT in Git (Phase 2)
 │   ├── processed/       Cleaned data + SQLite database, NOT in Git (Phase 3)
@@ -60,6 +60,7 @@ cd "$HOME\Desktop\Review-Reality"
 py -m venv .venv                 # make the virtual environment (only once)
 .venv\Scripts\Activate.ps1       # turn it on (each new terminal)
 python --version                 # should show Python 3.15.x
+python -m pip install -r requirements.txt   # install the libraries (only once)
 ```
 
 If PowerShell blocks `Activate.ps1`, run this once:
