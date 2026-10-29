@@ -1,0 +1,31 @@
+# Virtual environment (each person makes their own; it is large and machine-specific)
+.venv/
+
+# Python cache files (made automatically when Python runs)
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Secrets (this project should not need any, but never commit them)
+.env
+.env.*
+secrets.toml
+.streamlit/secrets.toml
+
+# Data: raw downloads and generated databases stay on this laptop.
+# The README explains how to download the data again.
+data/raw/
+data/processed/
+*.db
+*.sqlite
+*.sqlite3
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
+
+# Editor and system files
+.vscode/
+.idea/
+Thumbs.db
+Desktop.ini
+.DS_Store
