@@ -9,7 +9,7 @@ Review Reality is a review analytics project. It helps:
 
 Example question: a product has 4.8 stars, but many reviews mention battery problems. Another has 4.5 stars and fewer repeated complaints. Which one is the safer buy? Review Reality answers questions like this with evidence from real review data.
 
-> **Status:** Phase 1 (setup). No data or analysis yet. Nothing in this project is a finding until it is calculated from the real dataset.
+> **Status:** Phase 2 done (dataset chosen and documented). No findings yet. Nothing in this project is a finding until it is calculated from the real dataset.
 
 ## Honest limits (we will keep these all through the project)
 
@@ -41,16 +41,19 @@ Review-Reality/
 ├── README.md            Project overview, setup steps, progress
 ├── .gitignore           Files Git must never save (venv, data, secrets)
 ├── requirements.txt     Exact library list
-├── data/
-│   ├── raw/             Downloaded dataset, NOT in Git (Phase 2)
-│   ├── processed/       Cleaned data + SQLite database, NOT in Git (Phase 3)
-│   └── sample/          Tiny sample for tests, only if the licence allows (Phase 7)
-├── docs/                Dataset notes, data dictionary, method, findings
-├── notebooks/           Exploration notebooks (Phase 4)
-├── src/review_reality/  Reusable Python code: loading, cleaning, SQL, analytics
+├── pyproject.toml       Project settings (tells pytest where the code is)
+├── data/                NOT in Git
+│   ├── raw/datafiniti/  The three Kaggle CSV files
+│   └── processed/       Cleaned SQLite database (Phase 3)
+├── docs/
+│   └── DATASET.md       Source, licence, data dictionary, known issues
+├── review_reality/      Reusable Python code
+│   ├── paths.py         All file locations
+│   ├── load.py          Read the raw CSVs, rename columns
+│   └── products.py      Group listings into product families
 ├── sql/                 SQL query files (Phase 3)
-├── app/                 Streamlit dashboard (Phase 6)
-└── tests/               pytest tests (Phase 7, plus small tests along the way)
+├── app.py               Streamlit dashboard (Phase 6)
+└── tests/               pytest tests
 ```
 
 ## Setup (Windows)
@@ -69,7 +72,7 @@ If PowerShell blocks `Activate.ps1`, run this once:
 ## Progress
 
 - [x] **Phase 1:** Environment and project setup
-- [ ] **Phase 2:** Choose and understand the dataset
+- [x] **Phase 2:** Choose and understand the dataset
 - [ ] **Phase 3:** Data cleaning and SQL
 - [ ] **Phase 4:** Exploratory data analysis
 - [ ] **Phase 5:** Core analytics (sentiment, complaint types, similar reviews, comparisons)
@@ -79,4 +82,5 @@ If PowerShell blocks `Activate.ps1`, run this once:
 
 ## Data source and licence
 
-To be added in Phase 2.
+[Consumer Reviews of Amazon Products](https://www.kaggle.com/datasets/datafiniti/consumer-reviews-of-amazon-products) by **Datafiniti**, licensed **CC BY-NC-SA 4.0**. Reviews of Amazon-made devices (Fire tablets, Kindle, Echo, Fire TV, AmazonBasics batteries), collected mostly from Best Buy and Amazon, 2009–2019.
+The raw data is not included in this repository. See [docs/DATASET.md](docs/DATASET.md) for download steps, the data dictionary and known limitations.

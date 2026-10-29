@@ -1,0 +1,10 @@
+[project]
+name = "review-reality"
+version = "0.1.0"
+description = "Review analytics for shoppers and sellers: look beyond the star rating."
+requires-python = ">=3.12"
+
+[tool.pytest.ini_options]
+# Let tests import the review_reality package from the project root.
+pythonpath = ["."]
+testpaths = ["tests"]
