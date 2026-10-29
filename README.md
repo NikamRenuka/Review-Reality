@@ -9,7 +9,7 @@ Review Reality is a review analytics project. It helps:
 
 Example question: a product has 4.8 stars, but many reviews mention battery problems. Another has 4.5 stars and fewer repeated complaints. Which one is the safer buy? Review Reality answers questions like this with evidence from real review data.
 
-> **Status:** Phase 2 done (dataset chosen and documented). No findings yet. Nothing in this project is a finding until it is calculated from the real dataset.
+> **Status:** Phase 3 done (clean data in SQLite, tested SQL queries). Analysis comes next. Nothing in this project is a finding until it is calculated from the real dataset.
 
 ## Honest limits (we will keep these all through the project)
 
@@ -50,8 +50,11 @@ Review-Reality/
 ├── review_reality/      Reusable Python code
 │   ├── paths.py         All file locations
 │   ├── load.py          Read the raw CSVs, rename columns
-│   └── products.py      Group listings into product families
-├── sql/                 SQL query files (Phase 3)
+│   ├── products.py      Group listings into product families
+│   ├── clean.py         Fix types, remove unusable rows and copied reviews, anonymise reviewers
+│   ├── db.py            Save to SQLite, run SQL files
+│   └── build.py         Run everything: python -m review_reality.build
+├── sql/                 One SQL file per question (summary, ratings, trends, bursts, shops)
 ├── app.py               Streamlit dashboard (Phase 6)
 └── tests/               pytest tests
 ```
@@ -64,6 +67,8 @@ py -m venv .venv                 # make the virtual environment (only once)
 .venv\Scripts\Activate.ps1       # turn it on (each new terminal)
 python --version                 # should show Python 3.15.x
 python -m pip install -r requirements.txt   # install the libraries (only once)
+python -m review_reality.build   # clean the data and build data/processed/reviews.db (about 10 s)
+python -m pytest                 # run the tests
 ```
 
 If PowerShell blocks `Activate.ps1`, run this once:
@@ -73,7 +78,7 @@ If PowerShell blocks `Activate.ps1`, run this once:
 
 - [x] **Phase 1:** Environment and project setup
 - [x] **Phase 2:** Choose and understand the dataset
-- [ ] **Phase 3:** Data cleaning and SQL
+- [x] **Phase 3:** Data cleaning and SQL (67,992 raw rows → 51,163 unique reviews; see [docs/DATA_QUALITY.md](docs/DATA_QUALITY.md))
 - [ ] **Phase 4:** Exploratory data analysis
 - [ ] **Phase 5:** Core analytics (sentiment, complaint types, similar reviews, comparisons)
 - [ ] **Phase 6:** Dashboard (Shopper and Seller views)
