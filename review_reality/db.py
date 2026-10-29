@@ -61,9 +61,9 @@ def write_database(clean, db_path=DB_PATH):
 
 
 ANALYTICS_INDEXES = """
-CREATE INDEX idx_mentions_review ON aspect_mentions(review_id);
-CREATE INDEX idx_mentions_aspect ON aspect_mentions(aspect);
-CREATE INDEX idx_scores_review ON review_scores(review_id);
+CREATE INDEX IF NOT EXISTS idx_mentions_review ON aspect_mentions(review_id);
+CREATE INDEX IF NOT EXISTS idx_mentions_aspect ON aspect_mentions(aspect);
+CREATE INDEX IF NOT EXISTS idx_scores_review ON review_scores(review_id);
 """
 
 

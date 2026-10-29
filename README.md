@@ -9,7 +9,7 @@ Review Reality is a review analytics project. It helps:
 
 Example question: a product has 4.8 stars, but many reviews mention battery problems. Another has 4.5 stars and fewer repeated complaints. Which one is the safer buy? Review Reality answers questions like this with evidence from real review data.
 
-> **Status:** Phase 5 done (analytics calculated and tested). The dashboard comes next. Nothing in this project is a finding until it is calculated from the real dataset.
+> **Status:** Phase 6 done (dashboard built and tested). Final testing and documentation come next. Nothing in this project is a finding until it is calculated from the real dataset.
 
 ## Honest limits (we will keep these all through the project)
 
@@ -61,8 +61,10 @@ Review-Reality/
 │   ├── analytics.py     Aspect complaints, out-of-fold review scores, similar reviews
 │   └── build.py         Run everything: python -m review_reality.build
 ├── sql/                 One SQL file per question (summary, ratings, trends, bursts, aspects, mismatches)
-├── app.py               Streamlit dashboard (Phase 6)
-└── tests/               pytest tests
+├── app.py               Streamlit dashboard entry point (streamlit run app.py)
+├── dashboard/           One file per dashboard page, plus data.py (cached SQL) and style.py (look and feel)
+├── .streamlit/          Theme (colours, fonts) and settings (usage statistics off)
+└── tests/               pytest tests, including headless runs of every dashboard page
 ```
 
 ## Setup (Windows)
@@ -75,7 +77,20 @@ python --version                 # should show Python 3.15.x
 python -m pip install -r requirements.txt   # install the libraries (only once)
 python -m review_reality.build   # clean, analyse, build data/processed/reviews.db (about 2 min)
 python -m pytest                 # run the tests
+streamlit run app.py             # open the dashboard at http://localhost:8501
 ```
+
+## Dashboard
+
+| Page | What it answers |
+|---|---|
+| **Overview** | Which products have similar stars but very different complaint levels? |
+| **Shopper insights** | For one product (or two side by side): how ratings are spread, the most common complaints, and complaints hidden inside 4–5★ reviews. |
+| **Seller insights** | Complaint priorities, whether each complaint is rising or falling by quarter, customers' own words, ratings by shop, and reviews whose stars and words disagree. |
+| **Review patterns** | Review bursts (compared with the product's usual rating) and groups of near-identical reviews under different names, clearly labelled as patterns, not proof. |
+| **Data & method** | Source, licence, cleaning funnel, model test scores, hand-check result and limitations. |
+
+Every number on every page is calculated by a SQL file in `sql/` on the database built by `review_reality.build`.
 
 If PowerShell blocks `Activate.ps1`, run this once:
 `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`
@@ -87,7 +102,7 @@ If PowerShell blocks `Activate.ps1`, run this once:
 - [x] **Phase 3:** Data cleaning and SQL (67,992 raw rows → 51,163 unique reviews; see [docs/DATA_QUALITY.md](docs/DATA_QUALITY.md))
 - [x] **Phase 4:** Exploratory data analysis (complaint words found from the data itself)
 - [x] **Phase 5:** Core analytics (sentence-level aspect complaints, text model with balanced accuracy 0.895 on held-out reviews, similar reviews, bursts, star/text mismatches; see [docs/METHODOLOGY.md](docs/METHODOLOGY.md))
-- [ ] **Phase 6:** Dashboard (Shopper and Seller views)
+- [x] **Phase 6:** Dashboard (Overview, Shopper, Seller, Review patterns, Data & method)
 - [ ] **Phase 7:** Testing and quality checks
 - [ ] **Phase 8:** Documentation and interview preparation
 

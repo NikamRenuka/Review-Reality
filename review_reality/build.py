@@ -7,6 +7,8 @@
 5. Write docs/DATA_QUALITY.md and docs/ANALYSIS_RESULTS.md with the real
    numbers, so the documentation always matches the data instead of being typed by hand.
 """
+import pandas as pd
+
 from review_reality import analytics
 from review_reality.analytics import COMPLAINT_THRESHOLD
 from review_reality.clean import clean_reviews
@@ -87,6 +89,7 @@ def main():
 
     print("Running analytics (text model, aspects, similar reviews)...")
     tables = analytics.run_all(clean)
+    tables["build_steps"] = pd.DataFrame(steps, columns=["step", "rows"])
     write_analytics(tables)
     results_report = write_results_report(tables)
 
