@@ -1,112 +1,142 @@
 # Review Reality
 
-**Look Beyond the Stars.**
+**Look beyond the stars.**
 
-Review Reality is a review analytics project. It helps:
+Review Reality is a review analytics dashboard. It reads 51,163 product reviews to show what an average star rating hides:
 
-- **Shoppers** look past the average star rating: how ratings are spread, what people praise, and which complaints keep coming back.
-- **Sellers** find the most common complaints, see which product parts get good or bad feedback, and see how feedback changes over time.
+- **Shoppers** see how ratings are spread, which complaints keep coming back, and the warnings people write even in 4–5★ reviews.
+- **Sellers** see which problems to fix first, whether each problem is growing or shrinking, and the customers' own words.
+- **Everyone** sees unusual review activity (bursts, copied text) clearly labelled as *patterns worth checking*, never as proof of fake reviews.
 
-Example question: a product has 4.8 stars, but many reviews mention battery problems. Another has 4.5 stars and fewer repeated complaints. Which one is the safer buy? Review Reality answers questions like this with evidence from real review data.
+Built with Python, pandas, SQLite/SQL, scikit-learn, Streamlit and Plotly. Everything is free and runs locally.
 
-> **Status:** Phase 6 done (dashboard built and tested). Final testing and documentation come next. Nothing in this project is a finding until it is calculated from the real dataset.
+![Overview page](docs/screenshots/overview.png)
 
-## Honest limits (we will keep these all through the project)
+## Key findings
 
-- An unusual review is **not** proof of a fake review. We report "patterns worth checking", never "fake".
-- We use only a free, public dataset with a clear licence. No scraping, no paid APIs, no live marketplace data.
-- Every number in the dashboard comes from code that runs on the dataset. No made-up statistics.
+All numbers are calculated by the code in this repository (see [docs/ANALYSIS_RESULTS.md](docs/ANALYSIS_RESULTS.md)). Complaint figures are estimates; see [How much to trust the numbers](#how-much-to-trust-the-numbers).
 
-## Tech stack (all free, all run on this laptop)
+1. **Raw data overcounts.** The same review was attached to every colour and size of a product and repeated across three snapshot files. 67,992 raw rows contain only **51,163 unique reviews** (25% were copies).
+2. **Averages are crowded at the top.** 70.3% of reviews give 5 stars, and the 15 products with 300+ reviews average between 4.28★ and 4.75★.
+3. **Same stars, different stories.** AmazonBasics AAA Batteries (4.45★) and the Kindle E-reader (4.49★) look alike, but **8.8%** of battery reviews contain a complaint, against **5.1%** for the Kindle.
+4. **Battery life is the battery's weak spot.** 5.3% of all AAA-battery reviews complain about battery life, and 67.5% of sentences that mention battery life are negative. 77 reviews complain about **leaking**.
+5. **Hidden complaints in good reviews.** The Fire 7 Tablet's most common complaint is apps and content. Several come from 4–5★ reviews, for example not being able to install Google Play apps.
+6. **Review bursts look like gift season, not rating inflation.** 111 days had 5+ times a product's usual number of reviews. Two-thirds fall in December–January, and every burst's average rating is within 0.28 stars of the product's usual average.
+7. **Copy-paste reviews are rare.** Only 41 reviews (19 groups) are near-identical texts under different names. The largest is one AAA-battery review posted under 5 names between March and August 2016.
 
-| Tool | Why |
+## Screenshots
+
+| Shopper insights | Seller insights |
 |---|---|
-| Python 3.15 | Main language |
-| pandas, NumPy | Load, clean and summarise data |
-| SQLite + SQL | Store clean data and answer questions with SQL queries |
-| Streamlit | The dashboard (web app that runs locally) |
-| Plotly | Interactive charts |
-| scikit-learn | Only if a simple method is not good enough |
-| pytest | Automatic tests |
-| Git + GitHub | Version control and portfolio |
+| ![Shopper insights](docs/screenshots/shopper.png) | ![Seller insights](docs/screenshots/seller.png) |
+| **Review patterns** | **Data & method** |
+| ![Review patterns](docs/screenshots/patterns.png) | ![Data & method](docs/screenshots/method.png) |
 
-Exact versions are in `requirements.txt` (all tested on Python 3.15.1).
-
-## Planned folder structure
-
-Folders are created in the phase that first needs them.
-
-```
-Review-Reality/
-├── README.md            Project overview, setup steps, progress
-├── .gitignore           Files Git must never save (venv, data, secrets)
-├── requirements.txt     Exact library list
-├── pyproject.toml       Project settings (tells pytest where the code is)
-├── data/                NOT in Git
-│   ├── raw/datafiniti/  The three Kaggle CSV files
-│   └── processed/       Cleaned SQLite database (Phase 3)
-├── docs/
-│   ├── DATASET.md           Source, licence, data dictionary, known issues
-│   ├── METHODOLOGY.md       How each number is calculated and how far to trust it
-│   ├── DATA_QUALITY.md      Generated: cleaning counts, missing values
-│   └── ANALYSIS_RESULTS.md  Generated: model scores, complaints per product, patterns
-├── review_reality/      Reusable Python code
-│   ├── paths.py         All file locations
-│   ├── load.py          Read the raw CSVs, rename columns
-│   ├── products.py      Group listings into product families
-│   ├── clean.py         Fix types, remove unusable rows and copied reviews, anonymise reviewers
-│   ├── db.py            Save to SQLite, run SQL files
-│   ├── aspects.py       Keyword rules: which aspect a sentence talks about
-│   ├── sentiment.py     Text model: how negative a sentence sounds (tested on held-out reviews)
-│   ├── analytics.py     Aspect complaints, out-of-fold review scores, similar reviews
-│   └── build.py         Run everything: python -m review_reality.build
-├── sql/                 One SQL file per question (summary, ratings, trends, bursts, aspects, mismatches)
-├── app.py               Streamlit dashboard entry point (streamlit run app.py)
-├── dashboard/           One file per dashboard page, plus data.py (cached SQL) and style.py (look and feel)
-├── .streamlit/          Theme (colours, fonts) and settings (usage statistics off)
-└── tests/               pytest tests, including headless runs of every dashboard page
-```
-
-## Setup (Windows)
-
-```powershell
-cd "$HOME\Desktop\Review-Reality"
-py -m venv .venv                 # make the virtual environment (only once)
-.venv\Scripts\Activate.ps1       # turn it on (each new terminal)
-python --version                 # should show Python 3.15.x
-python -m pip install -r requirements.txt   # install the libraries (only once)
-python -m review_reality.build   # clean, analyse, build data/processed/reviews.db (about 2 min)
-python -m pytest                 # run the tests
-streamlit run app.py             # open the dashboard at http://localhost:8501
-```
-
-## Dashboard
+## Dashboard pages
 
 | Page | What it answers |
 |---|---|
 | **Overview** | Which products have similar stars but very different complaint levels? |
 | **Shopper insights** | For one product (or two side by side): how ratings are spread, the most common complaints, and complaints hidden inside 4–5★ reviews. |
 | **Seller insights** | Complaint priorities, whether each complaint is rising or falling by quarter, customers' own words, ratings by shop, and reviews whose stars and words disagree. |
-| **Review patterns** | Review bursts (compared with the product's usual rating) and groups of near-identical reviews under different names, clearly labelled as patterns, not proof. |
+| **Review patterns** | Review bursts compared with the product's usual rating, and groups of near-identical reviews under different names. |
 | **Data & method** | Source, licence, cleaning funnel, model test scores, hand-check result and limitations. |
 
-Every number on every page is calculated by a SQL file in `sql/` on the database built by `review_reality.build`.
+## How it works
 
-If PowerShell blocks `Activate.ps1`, run this once:
-`Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`
+```
+3 Kaggle CSV files ──► load.py ──► clean.py ──────────► SQLite (reviews.db) ──► sql/*.sql ──► Streamlit dashboard
+ (67,992 rows)        rename      fix types,            products + reviews        12 queries     5 pages
+                      columns     group listings into   + analytics tables
+                                  product families,
+                                  remove copies,
+                                  anonymise names
+                                         │
+                                         ▼
+                                  analytics.py: split into sentences → keyword rules tag aspects
+                                  → text model scores how negative each sentence is
+                                  → similar-review search, star/text mismatches
+```
 
-## Progress
+1. **Cleaning** (`review_reality/clean.py`): fills missing product names, groups 111 product listings into 20 product families, converts values safely, removes copied reviews, and replaces usernames with anonymous IDs.
+2. **SQL** (`sql/`): one file per question. Uses JOINs, GROUP BY, CASE, CTEs, window functions (`ROW_NUMBER`, `AVG() OVER`), LEFT JOINs and parameters.
+3. **Aspects** (`review_reality/aspects.py`): keyword rules for 17 aspects (battery life, leaking, speed, screen, ads, …). The keywords came from words that appear far more often in 1–2★ than in 4–5★ reviews.
+4. **Text model** (`review_reality/sentiment.py`): TF-IDF + logistic regression trained on the star ratings. It scores single sentences, so it can find complaints inside positive reviews.
+5. **Patterns** (`review_reality/analytics.py`, `sql/review_bursts.sql`): TF-IDF cosine similarity for near-identical texts; a window function for review bursts.
 
-- [x] **Phase 1:** Environment and project setup
-- [x] **Phase 2:** Choose and understand the dataset
-- [x] **Phase 3:** Data cleaning and SQL (67,992 raw rows → 51,163 unique reviews; see [docs/DATA_QUALITY.md](docs/DATA_QUALITY.md))
-- [x] **Phase 4:** Exploratory data analysis (complaint words found from the data itself)
-- [x] **Phase 5:** Core analytics (sentence-level aspect complaints, text model with balanced accuracy 0.895 on held-out reviews, similar reviews, bursts, star/text mismatches; see [docs/METHODOLOGY.md](docs/METHODOLOGY.md))
-- [x] **Phase 6:** Dashboard (Overview, Shopper, Seller, Review patterns, Data & method)
-- [x] **Phase 7:** Testing and quality checks (68 tests, no warnings; SQL results cross-checked against pandas on the real database)
-- [ ] **Phase 8:** Documentation and interview preparation
+Full explanation: [docs/METHODOLOGY.md](docs/METHODOLOGY.md).
+
+## How much to trust the numbers
+
+| Check | Result |
+|---|---|
+| Text model on 9,822 held-out reviews | Balanced accuracy **0.895** (baseline 0.5), recall 0.82, precision 0.54 |
+| Hand check of 50 random flagged complaint sentences | **38 of 50 (76%)** were real complaints about the tagged aspect |
+| SQL vs an independent pandas calculation on the real database | Identical (automated test) |
+| Automated tests | **68 passing**, including headless runs of every dashboard page and product |
+
+What the data **cannot** tell us: whether any review is fake (there are no labels), whether a reviewer really bought the product (no verified-purchase flag), or anything about today's products (reviews end in March 2019). Reviewer display names are shared by many people ("Amazon Customer"), so the project does not rank reviewers.
+
+## Run it yourself (Windows)
+
+1. Download the dataset (free Kaggle account): see [docs/DATASET.md](docs/DATASET.md). Unzip it into `data/raw/datafiniti/`.
+2. Then run:
+
+```powershell
+cd "$HOME\Desktop\Review-Reality"
+py -m venv .venv                            # make the virtual environment (only once)
+.venv\Scripts\Activate.ps1                  # turn it on (each new terminal)
+python -m pip install -r requirements.txt   # install the libraries (only once)
+python -m review_reality.build              # clean, analyse, build data/processed/reviews.db (about 2 min)
+python -m pytest                            # run the tests
+streamlit run app.py                        # open the dashboard at http://localhost:8501
+```
+
+If PowerShell blocks `Activate.ps1`, run this once: `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`
+
+## Project structure
+
+```
+Review-Reality/
+├── app.py               Dashboard entry point (streamlit run app.py)
+├── dashboard/           One file per page, plus data.py (cached SQL) and style.py (look and feel)
+├── review_reality/      Data pipeline and analysis
+│   ├── paths.py         All file locations
+│   ├── load.py          Read the raw CSVs, rename columns
+│   ├── products.py      Group listings into product families
+│   ├── clean.py         Fix types, remove unusable rows and copies, anonymise reviewers
+│   ├── db.py            Save to SQLite, run SQL files
+│   ├── aspects.py       Keyword rules: which aspect a sentence talks about
+│   ├── sentiment.py     Text model: how negative a sentence sounds
+│   ├── analytics.py     Aspect complaints, out-of-fold review scores, similar reviews
+│   ├── insights.py      Turns calculated tables into short findings
+│   └── build.py         Runs everything: python -m review_reality.build
+├── sql/                 12 SQL queries, one per question
+├── tests/               68 pytest tests
+├── docs/                Dataset, methodology, generated results, screenshots, interview notes
+├── .streamlit/          Theme and settings (usage statistics switched off)
+├── data/                Raw and processed data. NOT in Git
+├── requirements.txt     Exact library versions (tested on Python 3.15.1)
+└── pyproject.toml       Project settings
+```
 
 ## Data source and licence
 
-[Consumer Reviews of Amazon Products](https://www.kaggle.com/datasets/datafiniti/consumer-reviews-of-amazon-products) by **Datafiniti**, licensed **CC BY-NC-SA 4.0**. Reviews of Amazon-made devices (Fire tablets, Kindle, Echo, Fire TV, AmazonBasics batteries), collected mostly from Best Buy and Amazon, 2009–2019.
-The raw data is not included in this repository. See [docs/DATASET.md](docs/DATASET.md) for download steps, the data dictionary and known limitations.
+[Consumer Reviews of Amazon Products](https://www.kaggle.com/datasets/datafiniti/consumer-reviews-of-amazon-products) by **Datafiniti**, licensed **CC BY-NC-SA 4.0**. Reviews of Amazon-made devices (Fire tablets, Kindle, Echo, Fire TV, AmazonBasics batteries), collected mostly from Best Buy and Amazon, 2009–2019. The raw data is not included in this repository. Screenshots contain short review excerpts from this dataset, shared under the same licence with credit to Datafiniti.
+
+## Future improvements
+
+- Replace keyword rules with a model trained on a small hand-labelled set of aspect sentences, and measure the gain.
+- Handle negation ("it didn't lag") explicitly before scoring sentences.
+- Add a newer dataset to see whether the same complaints persist in later product generations.
+
+## Progress
+
+- [x] Phase 1: Environment and project setup
+- [x] Phase 2: Choose and understand the dataset
+- [x] Phase 3: Data cleaning and SQL
+- [x] Phase 4: Exploratory data analysis
+- [x] Phase 5: Core analytics
+- [x] Phase 6: Dashboard
+- [x] Phase 7: Testing and quality checks
+- [x] Phase 8: Documentation and interview preparation ([docs/INTERVIEW_PREP.md](docs/INTERVIEW_PREP.md))

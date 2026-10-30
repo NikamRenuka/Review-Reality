@@ -53,8 +53,8 @@ def render():
     cols = st.columns(len(METRIC_LABELS))
     for col, (key, (label, explanation)) in zip(cols, METRIC_LABELS.items()):
         baseline = metrics.get(f"baseline_{key}")
-        col.metric(label, f"{metrics[key]:.2f}", border=True, help=explanation,
-                   delta=f"{metrics[key] - baseline:+.2f} vs baseline" if baseline is not None else None,
+        col.metric(label, f"{metrics[key]:.3f}", border=True, help=explanation,
+                   delta=f"{metrics[key] - baseline:+.3f} vs baseline" if baseline is not None else None,
                    delta_color="off")
     st.markdown(
         "**Hand check:** 50 randomly chosen flagged sentences were read; **38 of 50 (76%)** were real complaints about the "
