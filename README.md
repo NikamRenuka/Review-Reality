@@ -103,7 +103,7 @@ If PowerShell blocks `Activate.ps1`, run this once:
 - [x] **Phase 4:** Exploratory data analysis (complaint words found from the data itself)
 - [x] **Phase 5:** Core analytics (sentence-level aspect complaints, text model with balanced accuracy 0.895 on held-out reviews, similar reviews, bursts, star/text mismatches; see [docs/METHODOLOGY.md](docs/METHODOLOGY.md))
 - [x] **Phase 6:** Dashboard (Overview, Shopper, Seller, Review patterns, Data & method)
-- [ ] **Phase 7:** Testing and quality checks
+- [x] **Phase 7:** Testing and quality checks (68 tests, no warnings; SQL results cross-checked against pandas on the real database)
 - [ ] **Phase 8:** Documentation and interview preparation
 
 ## Data source and licence

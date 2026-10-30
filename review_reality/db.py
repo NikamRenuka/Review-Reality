@@ -4,6 +4,7 @@ SQLite is a database that lives in a single file. It is built into Python,
 so it costs nothing and needs no server.
 """
 import sqlite3
+from contextlib import contextmanager
 
 import pandas as pd
 
@@ -37,6 +38,21 @@ CREATE INDEX idx_reviews_date ON reviews(review_date);
 """
 
 
+@contextmanager
+def connect(db_path=DB_PATH):
+    """Open the database, commit if everything worked, and always close it.
+
+    Note: `with sqlite3.connect(...) as conn` only commits or rolls back;
+    it does NOT close the connection. This helper does both.
+    """
+    conn = sqlite3.connect(db_path)
+    try:
+        with conn:
+            yield conn
+    finally:
+        conn.close()
+
+
 def write_database(clean, db_path=DB_PATH):
     """Create a fresh database file from the clean reviews table."""
     db_path.parent.mkdir(parents=True, exist_ok=True)
@@ -53,7 +69,7 @@ def write_database(clean, db_path=DB_PATH):
     reviews["recommends"] = reviews["recommends"].map({True: 1, False: 0})
     reviews["helpful_votes"] = reviews["helpful_votes"].astype("Int64")
 
-    with sqlite3.connect(db_path) as conn:
+    with connect(db_path) as conn:
         conn.executescript(SCHEMA)
         products.to_sql("products", conn, if_exists="append", index=False)
         reviews.to_sql("reviews", conn, if_exists="append", index=False)
@@ -69,7 +85,7 @@ CREATE INDEX IF NOT EXISTS idx_scores_review ON review_scores(review_id);
 
 def write_analytics(tables, db_path=DB_PATH):
     """Add the analytics tables (aspect_mentions, review_scores, ...) to the database."""
-    with sqlite3.connect(db_path) as conn:
+    with connect(db_path) as conn:
         for name, table in tables.items():
             table.to_sql(name, conn, if_exists="replace", index=False)
         conn.executescript(ANALYTICS_INDEXES)
@@ -84,5 +100,5 @@ def query(name, params=None, db_path=DB_PATH):
 
     `params` fills the :placeholders in the SQL safely (never paste user input into SQL text).
     """
-    with sqlite3.connect(db_path) as conn:
+    with connect(db_path) as conn:
         return pd.read_sql_query(read_sql_file(name), conn, params=params or {})

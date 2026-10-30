@@ -1,11 +1,10 @@
 """Data access for the dashboard. Every function runs a SQL file from sql/ and caches the result,
 so switching pages is instant and the numbers always come from the database."""
-import sqlite3
 
 import streamlit as st
 
 from review_reality.analytics import COMPLAINT_THRESHOLD
-from review_reality.db import query
+from review_reality.db import connect, query
 from review_reality.paths import DB_PATH
 
 MIN_PRODUCT_REVIEWS = 100   # products with fewer reviews are too small to describe fairly
@@ -15,7 +14,7 @@ REQUIRED_TABLES = {"products", "reviews", "aspect_mentions", "review_scores", "s
 def database_ready():
     if not DB_PATH.exists():
         return False
-    with sqlite3.connect(DB_PATH) as conn:
+    with connect() as conn:
         tables = {row[0] for row in conn.execute("SELECT name FROM sqlite_master WHERE type = 'table'")}
     return REQUIRED_TABLES <= tables
 
@@ -89,5 +88,5 @@ def sources(family, min_reviews=20):
 def table(name):
     """Read a small whole table (model_metrics, build_steps)."""
     import pandas as pd
-    with sqlite3.connect(DB_PATH) as conn:
+    with connect() as conn:
         return pd.read_sql_query(f"SELECT * FROM {name}", conn)  # name comes from our own code, never from users
